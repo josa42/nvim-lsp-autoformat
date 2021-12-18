@@ -69,9 +69,7 @@ end
 function l.select_client(method, client_names)
   local clients = vim.tbl_filter(function(client)
     return client.supports_method(method)
-  end, vim.tbl_values(
-    vim.lsp.buf_get_clients()
-  ))
+  end, vim.tbl_values(vim.lsp.buf_get_clients()))
 
   table.sort(clients, function(a, b)
     return a.name < b.name
