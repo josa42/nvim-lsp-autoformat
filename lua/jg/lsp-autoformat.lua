@@ -18,7 +18,7 @@ end
 
 function M.on_buf_write_pre()
   if l.auto_formatting_enabled(vim.fn.expand('<afile>:e')) then
-    l.buf_formatting()
+    M.buf_formatting()
   end
 end
 
@@ -49,7 +49,7 @@ function l.get_formatting_clients(ext)
   end
 end
 
-function l.buf_formatting(client_names)
+function M.buf_formatting(client_names)
   client_names = client_names or l.get_formatting_clients(vim.fn.expand('%:e'))
 
   local client = l.select_client('textDocument/formatting', client_names)
@@ -87,7 +87,7 @@ function l.select_client(method, client_names)
     end
   end
 
-  return clients[1]
+  return nil
 end
 
 return M
