@@ -17,14 +17,14 @@ function M.setup(clients)
 end
 
 function M.on_buf_write_pre()
-  if l.auto_formatting_enabled(vim.fn.expand('<afile>:e')) then
+  if l.auto_formatting_enabled(vim.fn.expand('<afile>:t'), vim.fn.expand('<afile>:e')) then
     M.buf_formatting()
   end
 end
 
-function l.auto_formatting_enabled(ext)
+function l.auto_formatting_enabled(name, ext)
   for v in pairs(M.formatting_clients) do
-    if v == ext then
+    if v == name or v == ext then
       return true
     end
   end
@@ -36,7 +36,10 @@ function l.auto_formatting_pattern()
   local pattern = {}
   for ext in pairs(M.formatting_clients) do
     table.insert(pattern, '*.' .. ext)
+    table.insert(pattern, ext)
   end
+
+  D(pattern)
 
   return pattern
 end
