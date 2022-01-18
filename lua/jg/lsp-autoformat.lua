@@ -39,8 +39,6 @@ function l.auto_formatting_pattern()
     table.insert(pattern, ext)
   end
 
-  D(pattern)
-
   return pattern
 end
 
