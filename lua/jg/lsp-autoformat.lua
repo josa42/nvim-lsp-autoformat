@@ -62,7 +62,7 @@ function M.buf_formatting(client_names)
 
   local response = client.request_sync('textDocument/formatting', params, 1000, bufnr)
   if response ~= nil and response.result ~= nil then
-    vim.lsp.util.apply_text_edits(response.result, bufnr)
+    vim.lsp.util.apply_text_edits(response.result, bufnr, vim.api.nvim_buf_get_option(bufnr, 'fileencoding'))
   end
 end
 
