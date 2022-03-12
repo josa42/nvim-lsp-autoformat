@@ -7,7 +7,7 @@ l.organize_imports_clients = { 'gopls' }
 function M.setup(clients)
   M.formatting_clients = clients or {}
 
-  local pattern = table.concat(l.auto_formatting_pattern(), ',')
+  local pattern = table.concat(vim.tbl_keys(M.formatting_clients), ',')
 
   vim.cmd([[
     augroup lsp-autoformat
@@ -18,41 +18,43 @@ function M.setup(clients)
 end
 
 function M.on_buf_write_pre()
-  if l.auto_formatting_enabled(vim.fn.expand('<afile>:t'), vim.fn.expand('<afile>:e')) then
+  if l.auto_formatting_enabled(vim.fn.expand('<afile>:t')) then
     M.buf_formatting()
   end
 end
 
-function l.auto_formatting_enabled(name, ext)
-  for v in pairs(M.formatting_clients) do
-    if v == name or v == ext then
-      return true
-    end
-  end
-
-  return false
+function l.auto_formatting_enabled(file_name)
+  return l.get_formatting_clients(file_name) ~= nil
 end
 
-function l.auto_formatting_pattern()
-  local pattern = {}
-  for ext in pairs(M.formatting_clients) do
-    table.insert(pattern, '*.' .. ext)
-    table.insert(pattern, ext)
-  end
-
-  return pattern
+function l.starts_with(str, prefix)
+  return string.sub(str, 1, string.len(prefix)) == prefix
 end
 
-function l.get_formatting_clients(ext)
-  for k, clients in pairs(M.formatting_clients) do
-    if k == ext then
+function l.ends_with(str, postfix)
+  return postfix == '' or str:sub(-#postfix) == postfix
+end
+
+function l.match_pattern(pattern, file_name)
+  if l.starts_with(pattern, '*') then
+    return l.ends_with(file_name, string.sub(pattern, 2))
+  elseif l.ends_with(pattern, '*') then
+    return l.starts_with(file_name, string.sub(pattern, 1, #pattern - 1))
+  end
+
+  return file_name == pattern
+end
+
+function l.get_formatting_clients(file_name)
+  for pattern, clients in pairs(M.formatting_clients) do
+    if l.match_pattern(pattern, file_name) then
       return clients
     end
   end
 end
 
 function M.buf_formatting(client_names)
-  client_names = client_names or l.get_formatting_clients(vim.fn.expand('%:e'))
+  client_names = client_names or l.get_formatting_clients(vim.fn.expand('%:t'))
 
   local client = l.select_client('textDocument/formatting', client_names)
   if client == nil then
