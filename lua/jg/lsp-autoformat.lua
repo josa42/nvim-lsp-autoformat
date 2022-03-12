@@ -2,6 +2,7 @@ local M = {}
 local l = {}
 
 M.formatting_clients = {}
+l.organize_imports_clients = { 'gopls' }
 
 function M.setup(clients)
   M.formatting_clients = clients or {}
@@ -58,12 +59,40 @@ function M.buf_formatting(client_names)
     return
   end
 
-  local params = vim.lsp.util.make_formatting_params(nil)
   local bufnr = vim.api.nvim_get_current_buf()
+  local encoding = vim.api.nvim_buf_get_option(bufnr, 'fileencoding')
 
-  local response = client.request_sync('textDocument/formatting', params, 1000, bufnr)
+  if vim.tbl_contains(l.organize_imports_clients, client.name) then
+    l.request_organize_imports(client, bufnr, encoding)
+  end
+
+  l.request_formatting(client, bufnr, encoding)
+end
+
+function l.request_formatting(client, bufnr, encoding)
+  local params = vim.lsp.util.make_formatting_params(nil)
+
+  l.request(client, 'textDocument/formatting', params, bufnr, function(result)
+    vim.lsp.util.apply_text_edits(result, bufnr, encoding)
+  end)
+end
+
+-- organize imports for gopls
+function l.request_organize_imports(client, bufnr, encoding)
+  local params = vim.lsp.util.make_range_params()
+  params.context = { source = { organizeImports = true } }
+
+  l.request(client, 'textDocument/codeAction', params, bufnr, function(result)
+    for _, r in ipairs(result) do
+      vim.lsp.util.apply_workspace_edit(r.edit, encoding)
+    end
+  end)
+end
+
+function l.request(client, method, params, bufnr, apply_fn)
+  local response = client.request_sync(method, params, 1000, bufnr)
   if response ~= nil and response.result ~= nil then
-    vim.lsp.util.apply_text_edits(response.result, bufnr, vim.api.nvim_buf_get_option(bufnr, 'fileencoding'))
+    apply_fn(response.result)
   end
 end
 
