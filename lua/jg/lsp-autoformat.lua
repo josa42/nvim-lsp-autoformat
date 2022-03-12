@@ -2,7 +2,6 @@ local M = {}
 local l = {}
 
 M.formatting_clients = {}
-l.organize_imports_clients = { 'gopls' }
 
 function M.setup(clients)
   M.formatting_clients = clients or {}
@@ -64,10 +63,7 @@ function M.buf_formatting(client_names)
   local bufnr = vim.api.nvim_get_current_buf()
   local encoding = vim.api.nvim_buf_get_option(bufnr, 'fileencoding')
 
-  if vim.tbl_contains(l.organize_imports_clients, client.name) then
-    l.request_organize_imports(client, bufnr, encoding)
-  end
-
+  l.request_organize_imports(client, bufnr, encoding)
   l.request_formatting(client, bufnr, encoding)
 end
 
@@ -79,10 +75,19 @@ function l.request_formatting(client, bufnr, encoding)
   end)
 end
 
--- organize imports for gopls
 function l.request_organize_imports(client, bufnr, encoding)
-  local params = vim.lsp.util.make_range_params()
-  params.context = { source = { organizeImports = true } }
+  if client.name == 'gopls' then
+    l.gopls_organize_imports(client, bufnr, encoding)
+  elseif client.name == 'tsserver' then
+    l.tsserver_organize_imports(client, bufnr)
+  end
+end
+
+-- organize imports for gopls
+function l.gopls_organize_imports(client, bufnr, encoding)
+  local params = vim.tbl_extend('force', vim.lsp.util.make_range_params(), {
+    source = { organizeImports = true },
+  })
 
   l.request(client, 'textDocument/codeAction', params, bufnr, function(result)
     for _, r in ipairs(result) do
@@ -91,9 +96,19 @@ function l.request_organize_imports(client, bufnr, encoding)
   end)
 end
 
+-- organize imports for tsserver
+function l.tsserver_organize_imports(client, bufnr)
+  local params = {
+    command = '_typescript.organizeImports',
+    arguments = { vim.api.nvim_buf_get_name(bufnr) },
+  }
+
+  l.request(client, 'workspace/executeCommand', params, bufnr)
+end
+
 function l.request(client, method, params, bufnr, apply_fn)
   local response = client.request_sync(method, params, 1000, bufnr)
-  if response ~= nil and response.result ~= nil then
+  if apply_fn ~= nil and response ~= nil and response.result ~= nil then
     apply_fn(response.result)
   end
 end
