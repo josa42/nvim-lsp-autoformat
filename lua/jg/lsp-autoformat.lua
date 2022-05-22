@@ -6,17 +6,14 @@ M.formatting_clients = {}
 function M.setup(clients)
   M.formatting_clients = clients or {}
 
-  local pattern = table.concat(vim.tbl_keys(M.formatting_clients), ',')
-
-  vim.cmd([[
-    augroup lsp-autoformat
-      au!
-      au! BufWritePre ]] .. pattern .. [[ lua require('jg.lsp-autoformat').on_buf_write_pre()
-    augroup END
-  ]])
+  vim.api.nvim_create_autocmd('BufWritePre', {
+    desc = 'LSP autoformat on write',
+    pattern = table.concat(vim.tbl_keys(M.formatting_clients), ','),
+    callback = l.on_buf_write_pre,
+  })
 end
 
-function M.on_buf_write_pre()
+function l.on_buf_write_pre()
   if l.auto_formatting_enabled(vim.fn.expand('<afile>:t')) then
     M.buf_formatting()
   end
