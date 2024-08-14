@@ -88,7 +88,9 @@ function l.gopls_organize_imports(client, bufnr, encoding)
 
   l.request(client, 'textDocument/codeAction', params, bufnr, function(result)
     for _, r in ipairs(result) do
-      vim.lsp.util.apply_workspace_edit(r.edit, encoding)
+      if r.edir ~= nil then
+        vim.lsp.util.apply_workspace_edit(r.edit, encoding)
+      end
     end
   end)
 end

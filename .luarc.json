@@ -1,0 +1,26 @@
+{
+    "workspace.library": [
+        "/Users/josa/.config/nvim",
+        "/Users/josa/.local/share/nvim/lazy/lazy.nvim",
+        "/Users/josa/.local/share/nvim/lazy/nvim-mason-install-all",
+        "/Users/josa/.local/share/nvim/lazy/mason.nvim",
+        "/Users/josa/.local/share/nvim/lazy/mason-lspconfig.nvim",
+        "/Users/josa/.local/share/nvim/lazy/cmp-nvim-lsp",
+        "/Users/josa/.local/share/nvim/lazy/SchemaStore.nvim",
+        "/Users/josa/.local/share/nvim/lazy/nvim-lspconfig",
+        "/Users/josa/.local/share/nvim/lazy/plenary.nvim",
+        "/Users/josa/.local/share/nvim/lazy/typescript-tools.nvim",
+        "/Users/josa/.local/share/nvim/lazy/vim-applescript",
+        "/Users/josa/.local/share/nvim/lazy/vim-mdx-js",
+        "/Users/josa/.config/nvim/plugins/git-commands",
+        "/Users/josa/.local/share/nvim/lazy/vim-monkey-c",
+        "/Users/josa/.local/share/nvim/lazy/nvim-actions",
+        "/Users/josa/.local/share/nvim/lazy/nvim-treesitter",
+        "/Users/josa/bin/neovim/share/nvim/runtime",
+        "/Users/josa/bin/neovim/lib/nvim",
+        "/Users/josa/.local/state/nvim/lazy/readme",
+        "/Users/josa/.local/share/nvim/lazy/cmp-nvim-lsp/after",
+        "/Users/josa/.local/share/nvim/lazy/vim-mdx-js/after",
+        "${3rd}/luassert/library"
+    ]
+}
