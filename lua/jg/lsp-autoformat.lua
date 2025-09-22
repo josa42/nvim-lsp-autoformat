@@ -106,7 +106,7 @@ function l.tsserver_organize_imports(client, bufnr)
 end
 
 function l.request(client, method, params, bufnr, apply_fn)
-  local response = client.request_sync(method, params, 1000, bufnr)
+  local response = client:request_sync(method, params, 1000, bufnr)
   if apply_fn ~= nil and response ~= nil and response.result ~= nil then
     apply_fn(response.result)
   end
@@ -114,8 +114,8 @@ end
 
 function l.select_client(method, client_names)
   local clients = vim.tbl_filter(function(client)
-    return client.supports_method(method)
-  end, vim.tbl_values(vim.lsp.buf_get_clients()))
+    return client:supports_method(method)
+  end, vim.tbl_values(vim.lsp.get_clients({ bufnr = 0 })))
 
   table.sort(clients, function(a, b)
     return a.name < b.name
